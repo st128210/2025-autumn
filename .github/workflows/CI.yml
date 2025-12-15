@@ -2,13 +2,22 @@ name: CI
 
 on: [push, pull_request]
 
+env:
+  VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+
 jobs:
   build-and-test:
     runs-on: windows-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
+    - name: Setup vcpkg (один раз для всех)
+      shell: pwsh
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
+        
     - name: Homework01 Build and Run 
       shell: pwsh
       run: |
@@ -30,7 +39,7 @@ jobs:
         } elseif (Test-Path "hw2") {
           ./hw2
         }
-
+    
     - name: Homework03 Build and Run 
       shell: pwsh  
       run: |
@@ -53,33 +62,41 @@ jobs:
           ./hw4
         }
         
-    - name: Install dependencies for gtest
+    - name: Install GoogleTest for HW5
       shell: pwsh
       run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        .\vcpkg\bootstrap-vcpkg.bat
         .\vcpkg\vcpkg install gtest:x64-windows
         
     - name: Homework02.2 Build and Run 
       shell: pwsh  
       run: |
         cd Homework05/Homework02.2
-        make CXXFLAGS="-I../../vcpkg/installed/x64-windows/include" LDFLAGS="-L../../vcpkg/installed/x64-windows/lib -lgtest"
+        
+        make CXXFLAGS="-I../../vcpkg/installed/x64-windows/include -std=c++17" \
+             LDFLAGS="-L../../vcpkg/installed/x64-windows/lib -lgtest -lgtest_main -lpthread"
+        
         if (Test-Path "text_editor.exe") { 
           ./text_editor.exe 
         } elseif (Test-Path "text_editor") {
           ./text_editor
+        } else {
+          Write-Error "text_editor not found!"
         }
         
     - name: Homework03.2 Build and Run  
       shell: pwsh  
       run: |
         cd Homework05/Homework03.2
-        make CXXFLAGS="-I../../vcpkg/installed/x64-windows/include" LDFLAGS="-L../../vcpkg/installed/x64-windows/lib -lgtest"
+        
+        make CXXFLAGS="-I../../vcpkg/installed/x64-windows/include -std=c++17" \
+             LDFLAGS="-L../../vcpkg/installed/x64-windows/lib -lgtest -lgtest_main -lpthread"
+        
         if (Test-Path "bank_account.exe") { 
           ./bank_account.exe 
         } elseif (Test-Path "bank_account") {
           ./bank_account
+        } else {
+          Write-Error "bank_account not found!"
         }
         
     - name: Homework06 Build and Run 
