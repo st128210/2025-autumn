@@ -1,0 +1,102 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup vcpkg 
+      shell: pwsh
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
+        
+    - name: Homework01 Build and Run 
+      shell: pwsh
+      run: |
+        cd Homework01
+        make
+        if (Test-Path "hw1.exe") { 
+          ./hw1.exe 
+        } elseif (Test-Path "hw1") {
+          ./hw1
+        }
+    
+    - name: Homework02 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework02
+        make
+        if (Test-Path "hw2.exe") { 
+          ./hw2.exe 
+        } elseif (Test-Path "hw2") {
+          ./hw2
+        }
+    
+    - name: Homework03 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework03
+        make
+        if (Test-Path "hw3.exe") { 
+          ./hw3.exe 
+        } elseif (Test-Path "hw3") {
+          ./hw3
+        }
+        
+    - name: Homework04 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework04
+        make
+        if (Test-Path "hw4.exe") { 
+          ./hw4.exe 
+        } elseif (Test-Path "hw4") {
+          ./hw4
+        }
+        
+    - name: Install GoogleTest for HW5
+      shell: pwsh
+      run: |
+        .\vcpkg\vcpkg install gtest:x64-windows
+        
+    - name: Homework02.2 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework02
+        make
+        if (Test-Path "hw2.exe") { 
+          ./hw2.exe 
+        } elseif (Test-Path "hw2") {
+          ./hw2
+        }
+        
+        
+    - name: Homework03.2 Build and Run  
+      shell: pwsh  
+      run: |
+        cd Homework03
+        make
+        if (Test-Path "hw2.exe") { 
+          ./hw2.exe 
+        } elseif (Test-Path "hw2") {
+          ./hw2
+        }
+        
+    - name: Homework06 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework06
+        make
+        if (Test-Path "hw6.exe") { 
+          ./hw6.exe 
+        } elseif (Test-Path "hw6") {
+          ./hw6
+        }
