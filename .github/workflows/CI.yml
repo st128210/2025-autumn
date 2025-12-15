@@ -9,11 +9,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install MinGW (если нужно)
-      shell: pwsh
-      run: |
-        choco install mingw -y
-    
     - name: Homework01 Build and Run 
       shell: pwsh
       run: |
