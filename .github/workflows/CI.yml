@@ -1,94 +1,84 @@
-name: CI
+name: Windows CI
 
 on: [push, pull_request]
+
+env:
+  VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+  CMAKE_TOOLCHAIN_FILE: "${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 jobs:
   build-and-test:
     runs-on: windows-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
-    - name: Homework01 Build and Run 
-      shell: pwsh
-      run: |
-        cd Homework01
-        make
-        if (Test-Path "hw1.exe") { 
-          ./hw1.exe 
-        } elseif (Test-Path "hw1") {
-          ./hw1
-        }
-    
-    - name: Homework02 Build and Run 
-      shell: pwsh  
-      run: |
-        cd Homework02
-        make
-        if (Test-Path "hw2.exe") { 
-          ./hw2.exe 
-        } elseif (Test-Path "hw2") {
-          ./hw2
-        }
-
-    - name: Homework03 Build and Run 
-      shell: pwsh  
-      run: |
-        cd Homework03
-        make
-        if (Test-Path "hw3.exe") { 
-          ./hw3.exe 
-        } elseif (Test-Path "hw3") {
-          ./hw3
-        }
-        
-    - name: Homework04 Build and Run 
-      shell: pwsh  
-      run: |
-        cd Homework04
-        make
-        if (Test-Path "hw4.exe") { 
-          ./hw4.exe 
-        } elseif (Test-Path "hw4") {
-          ./hw4
-        }
-        
-    - name: Install dependencies for gtest
+    - name: Setup vcpkg 
       shell: pwsh
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         .\vcpkg\bootstrap-vcpkg.bat
         .\vcpkg\vcpkg install gtest:x64-windows
         
-    - name: Homework02.2 Build and Run 
+    - name: Build HW1 
+      shell: pwsh
+      run: |
+        cd 2025.09.20_HW1
+        cmake -B build -S .
+        cmake --build build --config Release
+        $exe = Get-ChildItem -Path build -Recurse -Filter "hw1.exe" | Select-Object -First 1
+        if ($exe) { & $exe.FullName } else { Write-Error "hw1.exe not found" }
+    
+    - name: Build HW2 
       shell: pwsh  
       run: |
-        cd Homework05/Homework02.2
-        make CXXFLAGS="-I../../vcpkg/installed/x64-windows/include" LDFLAGS="-L../../vcpkg/installed/x64-windows/lib -lgtest"
-        if (Test-Path "text_editor.exe") { 
-          ./text_editor.exe 
-        } elseif (Test-Path "text_editor") {
-          ./text_editor
-        }
+        cd 2025.09.28_HW2
+        cmake -B build -S .
+        cmake --build build --config Release
+        $exe = Get-ChildItem -Path build -Recurse -Filter "hw2.exe" | Select-Object -First 1
+        if ($exe) { & $exe.FullName } else { Write-Error "hw2.exe not found" }
+
+    - name: Build HW3 
+      shell: pwsh  
+      run: |
+        cd 2025.10.04_HW3
+        cmake -B build -S .
+        cmake --build build --config Release
+        $exe = Get-ChildItem -Path build -Recurse -Filter "hw3.exe" | Select-Object -First 1
+        if ($exe) { & $exe.FullName } else { Write-Error "hw3.exe not found" }
         
-    - name: Homework03.2 Build and Run  
+    - name: Build HW4 
       shell: pwsh  
       run: |
-        cd Homework05/Homework03.2
-        make CXXFLAGS="-I../../vcpkg/installed/x64-windows/include" LDFLAGS="-L../../vcpkg/installed/x64-windows/lib -lgtest"
-        if (Test-Path "bank_account.exe") { 
-          ./bank_account.exe 
-        } elseif (Test-Path "bank_account") {
-          ./bank_account
-        }
+        cd 2025.10.11_HW4
+        cmake -B build -S .
+        cmake --build build --config Release
+        $exe = Get-ChildItem -Path build -Recurse -Filter "hw4.exe" | Select-Object -First 1
+        if ($exe) { & $exe.FullName } else { Write-Error "hw4.exe not found" }
         
-    - name: Homework06 Build and Run 
+    - name: Build TextEditor 
       shell: pwsh  
       run: |
-        cd Homework06
-        make
-        if (Test-Path "hw6.exe") { 
-          ./hw6.exe 
-        } elseif (Test-Path "hw6") {
-          ./hw6
-        }
+        cd 2025.10.18_HW5/TextEditor
+        cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="${{ env.CMAKE_TOOLCHAIN_FILE }}"
+        cmake --build build --config Release
+        $exe = Get-ChildItem -Path build -Recurse -Filter "text_editor.exe" | Select-Object -First 1
+        if ($exe) { & $exe.FullName } else { Write-Error "text_editor.exe not found" }
+        
+    - name: Build BankAccount 
+      shell: pwsh  
+      run: |
+        cd 2025.10.18_HW5/BankAccount
+        cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="${{ env.CMAKE_TOOLCHAIN_FILE }}"
+        cmake --build build --config Release
+        $exe = Get-ChildItem -Path build -Recurse -Filter "bank_account.exe" | Select-Object -First 1
+        if ($exe) { & $exe.FullName } else { Write-Error "bank_account.exe not found" }
+        
+    - name: Build HW6 
+      shell: pwsh  
+      run: |
+        cd 2025.10.25_HW6
+        cmake -B build -S .
+        cmake --build build --config Release
+        $exe = Get-ChildItem -Path build -Recurse -Filter "hw6.exe" | Select-Object -First 1
+        if ($exe) { & $exe.FullName } else { Write-Error "hw6.exe not found" }
