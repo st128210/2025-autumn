@@ -1,0 +1,99 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install MinGW (если нужно)
+      shell: pwsh
+      run: |
+        choco install mingw -y
+    
+    - name: Homework01 Build and Run 
+      shell: pwsh
+      run: |
+        cd Homework01
+        make
+        if (Test-Path "hw1.exe") { 
+          ./hw1.exe 
+        } elseif (Test-Path "hw1") {
+          ./hw1
+        }
+    
+    - name: Homework02 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework02
+        make
+        if (Test-Path "hw2.exe") { 
+          ./hw2.exe 
+        } elseif (Test-Path "hw2") {
+          ./hw2
+        }
+
+    - name: Homework03 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework03
+        make
+        if (Test-Path "hw3.exe") { 
+          ./hw3.exe 
+        } elseif (Test-Path "hw3") {
+          ./hw3
+        }
+        
+    - name: Homework04 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework04
+        make
+        if (Test-Path "hw4.exe") { 
+          ./hw4.exe 
+        } elseif (Test-Path "hw4") {
+          ./hw4
+        }
+        
+    - name: Install dependencies for gtest
+      shell: pwsh
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
+        .\vcpkg\vcpkg install gtest:x64-windows
+        
+    - name: Homework02.2 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework05/Homework02.2
+        make CXXFLAGS="-I../../vcpkg/installed/x64-windows/include" LDFLAGS="-L../../vcpkg/installed/x64-windows/lib -lgtest"
+        if (Test-Path "text_editor.exe") { 
+          ./text_editor.exe 
+        } elseif (Test-Path "text_editor") {
+          ./text_editor
+        }
+        
+    - name: Homework03.2 Build and Run  
+      shell: pwsh  
+      run: |
+        cd Homework05/Homework03.2
+        make CXXFLAGS="-I../../vcpkg/installed/x64-windows/include" LDFLAGS="-L../../vcpkg/installed/x64-windows/lib -lgtest"
+        if (Test-Path "bank_account.exe") { 
+          ./bank_account.exe 
+        } elseif (Test-Path "bank_account") {
+          ./bank_account
+        }
+        
+    - name: Homework06 Build and Run 
+      shell: pwsh  
+      run: |
+        cd Homework06
+        make
+        if (Test-Path "hw6.exe") { 
+          ./hw6.exe 
+        } elseif (Test-Path "hw6") {
+          ./hw6
+        }
