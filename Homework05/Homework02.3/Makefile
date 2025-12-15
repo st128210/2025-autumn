@@ -1,31 +1,46 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -I./vcpkg/installed/x64-windows/include
-TARGET = programm
-TARGET_TEST = programm_test
-SOURCE = main.cpp
+TARGET = text_editor
 
-VCPKG_INCLUDE = ./vcpkg/installed/x64-windows/include
-VCPKG_LIB = ./vcpkg/installed/x64-windows/lib
+CXXFLAGS ?= -std=c++17 -Wall -Wextra
+LDFLAGS ?= 
 
-LINK_FLAGS = -L$(VCPKG_LIB) -lgtest -lgtest_main -lpthread
+ifeq ($(origin CXXFLAGS), environment)
+    ACTUAL_CXXFLAGS = $(CXXFLAGS)
+else
+    ACTUAL_CXXFLAGS = -std=c++17 -Wall -Wextra
+endif
+
+ifeq ($(origin LDFLAGS), environment)
+    ACTUAL_LDFLAGS = $(LDFLAGS)
+else
+    ACTUAL_LDFLAGS = 
+endif
+
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
 
 all: $(TARGET)
 
-$(TARGET): $(SOURCE)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SOURCE)
+$(TARGET): $(OBJECTS)
+	$(CXX) $(ACTUAL_CXXFLAGS) -o $@ $^ $(ACTUAL_LDFLAGS)
 
-test-build: $(SOURCE)
-	$(CXX) $(CXXFLAGS) -I$(VCPKG_INCLUDE) -o $(TARGET_TEST) $(SOURCE) $(LINK_FLAGS)
-
-test: test-build
-	./$(TARGET_TEST)
+%.o: %.cpp
+	$(CXX) $(ACTUAL_CXXFLAGS) -c $< -o $@
 
 run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f $(TARGET) $(TARGET_TEST)
+	rm -f $(TARGET) $(OBJECTS)
 
 rebuild: clean all
 
-.PHONY: all clean rebuild run test test-build
+debug:
+	@echo "CXX: $(CXX)"
+	@echo "CXXFLAGS from env: $(CXXFLAGS)"
+	@echo "Actual CXXFLAGS: $(ACTUAL_CXXFLAGS)"
+	@echo "LDFLAGS from env: $(LDFLAGS)"
+	@echo "Actual LDFLAGS: $(ACTUAL_LDFLAGS)"
+	@echo "Sources: $(SOURCES)"
+
+.PHONY: all clean rebuild run debug
